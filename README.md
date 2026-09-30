@@ -1,75 +1,35 @@
-# React + TypeScript + Vite
+# alexnajy.github.io
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Portfolio for Alexander Najy, built as an investigator's corkboard: a 3D board
+(React Three Fiber) for exploring, and HTML case files for reading.
 
-Currently, two official plugins are available:
+Live at https://alexnajy.github.io/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Commands
 
 ```
+npm run dev      # local dev server
+npm run build    # production build into dist/
+npm run lint
+npm run deploy   # build and publish dist/ to the gh-pages branch
+```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Editing content
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Everything on the board lives in `src/data/case.ts`: the subject profile,
+contact links, every pin, and the strings between them. To add a project, add
+a pin with `kind: 'project'`, give it a free board position (`x`/`y` from -1
+to 1), and add its connections.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Put your resume at `public/resume.pdf`.
+- Put a compressed photo (roughly 600×750 JPEG/WebP) in `public/` and set `subject.photo`.
 
+## Layout
+
+```
+src/
+  data/        content and types
+  lib/         hash router, media queries, connection graph
+  components/  HTML: case index, dossier overlay, mobile stack
+  scene/       3D: board, cards, strings, camera rig (lazy-loaded)
 ```

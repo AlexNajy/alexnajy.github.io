@@ -1,122 +1,84 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { AnimatePresence, MotionConfig } from 'framer-motion'
+import { Suspense, lazy, useEffect, useState } from 'react'
+import { Dossier } from './components/Dossier'
+import { MobileStack } from './components/MobileStack'
+import { SceneBoundary } from './components/SceneBoundary'
+import { FileNav } from './components/FileNav'
+import { subject } from './data/case'
+import type { CardOrigin } from './lib/cardOrigin'
+import { pinById } from './lib/graph'
+import { detectQuality, useIsMobile, usePrefersReducedMotion } from './lib/media'
+import { closeFile, openFile, useOpenFileId } from './lib/router'
 
-function App() {
-  const [count, setCount] = useState(0)
+// The 3D board is its own chunk. The shell, index and dossiers render
+// straight away, and phones never download three.js at all.
+const BoardScene = lazy(() => import('./scene/BoardScene'))
+
+const quality = detectQuality()
+
+export default function App() {
+  const isMobile = useIsMobile()
+  const reducedMotion = usePrefersReducedMotion()
+  const openId = useOpenFileId()
+  const openPin = openId ? pinById.get(openId) : undefined
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [origin, setOrigin] = useState<CardOrigin | null>(null)
+
+  const openFromBoard = (id: string, from: CardOrigin) => {
+    setOrigin(from)
+    openFile(id)
+  }
+
+  useEffect(() => {
+    document.title = openPin && openPin.kind !== 'subject'
+      ? `${openPin.title} · Case file · ${subject.name}`
+      : `${subject.name} · Portfolio`
+  }, [openPin])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <MotionConfig reducedMotion="user">
+      {isMobile ? (
+        <MobileStack />
+      ) : (
+        <>
+          <FileNav onHover={setHoveredId} />
+          <main className="stage" aria-label="Board">
+            <SceneBoundary fallback={<StageMessage text="The board couldn't load on this device. Press Tab to browse the files." />}>
+              <Suspense fallback={<StageMessage text="Developing photographs…" />}>
+                <BoardScene
+                  hoveredId={hoveredId}
+                  openId={openPin?.id ?? null}
+                  onHover={setHoveredId}
+                  onOpen={openFromBoard}
+                  reducedMotion={reducedMotion}
+                  quality={quality}
+                />
+              </Suspense>
+            </SceneBoundary>
+          </main>
+        </>
+      )}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <AnimatePresence>
+        {openPin && (
+          <Dossier
+            key={openPin.id}
+            pin={openPin}
+            // Links in the page and the file list open files without a card
+            // to fly from, so only use the origin if it belongs to this file.
+            origin={origin?.id === openPin.id ? origin : null}
+            onClose={closeFile}
+          />
+        )}
+      </AnimatePresence>
+    </MotionConfig>
   )
 }
 
-export default App
+function StageMessage({ text }: { text: string }) {
+  return (
+    <div className="stage__message">
+      <p>{text}</p>
+    </div>
+  )
+}
