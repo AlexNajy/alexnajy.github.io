@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber'
-import { EffectComposer, Noise, ToneMapping, Vignette } from '@react-three/postprocessing'
+import { EffectComposer, Noise, ToneMapping } from '@react-three/postprocessing'
 import { connections, pins } from '../data/case'
 import { highlightSet, pinById } from '../lib/graph'
 import type { CardOrigin } from '../lib/cardOrigin'
@@ -42,18 +42,19 @@ export default function BoardScene({ hoveredId, openId, onHover, onOpen, reduced
       gl={{ antialias: !high, powerPreference: 'high-performance' }}
       onPointerMissed={() => onHover(null)}
     >
-      <color attach="background" args={['#0d0a08']} />
+      <color attach="background" args={['#2a1c12']} />
 
-      {/* Barely-there fill so the unlit edges of the board aren't pure black. */}
-      <ambientLight intensity={0.12} color="#ffe2c0" />
-      {/* The desk lamp. Wide penumbra gives the soft pool of light with edges
-          that fade out. decay 0 keeps intensity independent of distance, which
-          is easier to tune than physical falloff for a single stylised light. */}
+      {/* Warm fill so the whole board stays lit, not just the centre. */}
+      <ambientLight intensity={0.45} color="#ffd9ae" />
+      {/* The desk lamp. The cone is wide enough to cover the whole board, so
+          its soft edge falls on the wall rather than darkening the corners.
+          decay 0 keeps intensity independent of distance, which is easier to
+          tune than physical falloff for a single stylised light. */}
       <spotLight
         position={[-2.2, 3.2, 10]}
-        angle={0.5}
-        penumbra={0.85}
-        intensity={3.4}
+        angle={0.72}
+        penumbra={0.7}
+        intensity={2.6}
         decay={0}
         color="#ffd6a0"
         castShadow
@@ -96,7 +97,6 @@ export default function BoardScene({ hoveredId, openId, onHover, onOpen, reduced
         // (multisampling) rather than on the canvas.
         <EffectComposer multisampling={4}>
           <ToneMapping />
-          <Vignette offset={0.28} darkness={0.72} />
           <Noise opacity={0.045} premultiply />
         </EffectComposer>
       )}

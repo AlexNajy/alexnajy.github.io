@@ -59,7 +59,7 @@ export function Corkboard() {
       {/* The wall. It only exists to catch the spotlight's falloff. */}
       <mesh position={[0, 0, -0.08]} receiveShadow>
         <planeGeometry args={[60, 40]} />
-        <meshStandardMaterial color="#2a211b" roughness={1} />
+        <meshStandardMaterial color="#5a4030" roughness={1} />
       </mesh>
 
       <mesh receiveShadow>
