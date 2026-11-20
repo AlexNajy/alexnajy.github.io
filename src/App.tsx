@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect, useState } from 'react'
 import { Dossier } from './components/Dossier'
 import { MobileStack } from './components/MobileStack'
 import { SceneBoundary } from './components/SceneBoundary'
+import { SiteHeader } from './components/SiteHeader'
 import { FileNav } from './components/FileNav'
 import { subject } from './data/case'
 import type { CardOrigin } from './lib/cardOrigin'
@@ -41,10 +42,11 @@ export default function App() {
         <MobileStack />
       ) : (
         <>
+          <SiteHeader />
           <FileNav onHover={setHoveredId} />
           <main className="stage" aria-label="Board">
             <SceneBoundary fallback={<StageMessage text="The board couldn't load on this device. Press Tab to browse the files." />}>
-              <Suspense fallback={<StageMessage text="Developing photographs…" />}>
+              <Suspense fallback={<StageMessage text="Loading the board…" />}>
                 <BoardScene
                   hoveredId={hoveredId}
                   openId={openPin?.id ?? null}
@@ -55,6 +57,7 @@ export default function App() {
                 />
               </Suspense>
             </SceneBoundary>
+            <p className="stage__hint">Hover a card to see what it connects to. Click to open it.</p>
           </main>
         </>
       )}

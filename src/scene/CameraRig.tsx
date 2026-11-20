@@ -8,7 +8,7 @@ interface CameraRigProps {
   reducedMotion: boolean
 }
 
-const HOME_MARGIN = 1.04
+const HOME_MARGIN = 1.12
 const FOCUS_MARGIN = 1.5
 /** Small cards still get this much board around them, so the pins don't fill the screen. */
 const FOCUS_MIN = { width: 3, height: 2 }

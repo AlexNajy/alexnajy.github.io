@@ -1,20 +1,20 @@
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef } from 'react'
-import { QuadraticBezierCurve3, TubeGeometry, Vector3, type MeshStandardMaterial } from 'three'
+import { QuadraticBezierCurve3, TubeGeometry, Vector3, type Mesh, type MeshStandardMaterial } from 'three'
 import { seededRandom } from './boardSpace'
-import type { Emphasis } from './PinnedItem'
 
 interface RedStringProps {
   id: string
   from: [number, number, number]
   to: [number, number, number]
-  emphasis: Emphasis
+  /** Strings stay off the board until one of their two cards is in focus. */
+  shown: boolean
 }
 
-const RADIUS = 0.0075
-const OPACITY: Record<Emphasis, number> = { lit: 1, normal: 0.9, dim: 0.14 }
+const RADIUS = 0.011
 
-export function RedString({ id, from, to, emphasis }: RedStringProps) {
+export function RedString({ id, from, to, shown }: RedStringProps) {
+  const meshRef = useRef<Mesh>(null)
   const materialRef = useRef<MeshStandardMaterial>(null)
 
   // A quadratic bezier with its control point pulled down gives the sag of
@@ -32,24 +32,25 @@ export function RedString({ id, from, to, emphasis }: RedStringProps) {
   useEffect(() => () => geometry.dispose(), [geometry])
 
   useFrame((_, delta) => {
+    const mesh = meshRef.current
     const material = materialRef.current
-    if (!material) return
-    const ease = 1 - Math.exp(-delta * 10)
-    material.opacity += (OPACITY[emphasis] - material.opacity) * ease
-    const glow = emphasis === 'lit' ? 0.7 : 0
-    material.emissiveIntensity += (glow - material.emissiveIntensity) * ease
+    if (!mesh || !material) return
+    material.opacity += ((shown ? 1 : 0) - material.opacity) * (1 - Math.exp(-delta * 10))
+    // A transparent mesh still writes to the shadow map, so a faded-out
+    // string has to be hidden outright or its shadow stays on the cork.
+    mesh.visible = material.opacity > 0.02
   })
 
   return (
-    <mesh geometry={geometry} castShadow raycast={() => null}>
+    <mesh ref={meshRef} geometry={geometry} visible={false} castShadow raycast={() => null}>
       <meshStandardMaterial
         ref={materialRef}
-        color="#b01c16"
+        color="#c9241a"
         emissive="#e3140a"
-        emissiveIntensity={0}
+        emissiveIntensity={0.55}
         roughness={0.7}
         transparent
-        opacity={OPACITY.normal}
+        opacity={0}
       />
     </mesh>
   )

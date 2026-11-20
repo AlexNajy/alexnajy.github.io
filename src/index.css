@@ -1,9 +1,9 @@
 :root {
-  --room: #2a1c12;
-  --panel: #16110d;
-  --panel-line: #2e241b;
-  --text-on-dark: #eadfca;
-  --muted-on-dark: #b3a58d;
+  --room: #101114;
+  --panel: #17191d;
+  --panel-line: #2b2e34;
+  --text-on-dark: #f1ede4;
+  --muted-on-dark: #a4a7ad;
   --paper: #efe4c8;
   --paper-dark: #e0d0a6;
   --ink: #2b2219;
@@ -13,9 +13,12 @@
 
   --typewriter: 'Special Elite', 'Courier New', monospace;
   --mono: 'Courier Prime', 'Courier New', monospace;
+  /* Reading text. The typewriter faces are for titles, labels and stamps. */
+  --sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --header-height: 60px;
 
   color-scheme: dark;
-  font: 16px/1.5 var(--mono);
+  font: 16px/1.55 var(--sans);
   color: var(--text-on-dark);
   background: var(--room);
   -webkit-font-smoothing: antialiased;
@@ -58,6 +61,7 @@ a {
 }
 
 .eyebrow {
+  font-family: var(--mono);
   font-size: 0.75rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -66,10 +70,60 @@ a {
 
 /* Desktop: the board fills the whole screen */
 
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  height: var(--header-height);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--panel-line);
+  background: var(--panel);
+}
+
+.site-header__who {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+}
+
+.site-header__name {
+  font-family: var(--typewriter);
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.site-header__title {
+  overflow: hidden;
+  font-size: 0.9rem;
+  color: var(--muted-on-dark);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-header .contact-links {
+  flex-wrap: nowrap;
+}
+
 .stage {
   position: fixed;
-  inset: 0;
+  inset: var(--header-height) 0 0;
   background: var(--room);
+}
+
+.stage__hint {
+  position: absolute;
+  inset: auto 0 14px;
+  font-size: 0.8rem;
+  color: var(--muted-on-dark);
+  text-align: center;
+  pointer-events: none;
 }
 
 .stage__message {
@@ -86,7 +140,7 @@ a {
 
 .file-nav {
   position: fixed;
-  top: 16px;
+  top: calc(var(--header-height) + 12px);
   left: 16px;
   z-index: 40;
   display: grid;
@@ -95,7 +149,7 @@ a {
   width: min(760px, calc(100vw - 32px));
   padding: 16px 20px;
   border: 1px solid var(--panel-line);
-  background: rgb(22 17 13 / 0.94);
+  background: rgb(23 25 29 / 0.96);
 }
 
 .file-nav:not(:focus-within) {
@@ -108,6 +162,7 @@ a {
 }
 
 .file-nav__heading {
+  font-family: var(--mono);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -131,17 +186,17 @@ a {
 .contact-link {
   display: inline-block;
   padding: 6px 12px;
-  border: 1px solid #5a4833;
-  border-radius: 2px;
-  font-size: 0.9rem;
-  font-weight: 700;
+  border: 1px solid #454950;
+  border-radius: 3px;
+  font-size: 0.88rem;
+  font-weight: 600;
   text-decoration: none;
   transition: background-color 0.15s, border-color 0.15s;
 }
 
 .contact-link:hover {
   border-color: var(--text-on-dark);
-  background: #2a1f16;
+  background: #24272c;
 }
 
 .contact-link--primary {
@@ -178,7 +233,8 @@ a {
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgb(42 28 18 / 0.55);
+  background: rgb(10 11 13 / 0.66);
+  backdrop-filter: blur(5px);
 }
 
 .paper {
@@ -223,6 +279,7 @@ a {
 }
 
 .paper__kicker {
+  font-family: var(--mono);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -255,7 +312,7 @@ a {
 
 .paper__headline {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .paper__draft {
@@ -263,6 +320,7 @@ a {
   padding: 8px 12px;
   border: 1px dashed var(--red);
   color: var(--red);
+  font-family: var(--mono);
   font-size: 0.9rem;
 }
 
@@ -277,6 +335,7 @@ a {
 
 .paper__meta dt,
 .paper__field {
+  font-family: var(--mono);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -287,7 +346,7 @@ a {
 
 .paper__value {
   margin-bottom: 8px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .paper__section {
@@ -317,6 +376,7 @@ a {
   padding: 2px 10px;
   border: 1px solid rgb(43 34 25 / 0.5);
   background: rgb(255 255 255 / 0.35);
+  font-family: var(--mono);
   font-size: 0.88rem;
 }
 
@@ -349,7 +409,7 @@ a {
   padding: 8px 16px;
   background: var(--ink);
   color: var(--paper);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -417,6 +477,7 @@ a {
   padding: 4px 24px;
   border-radius: 4px 4px 0 0;
   background: #c49a45;
+  font-family: var(--mono);
   font-weight: 700;
   font-size: 0.8rem;
   letter-spacing: 0.16em;
@@ -508,6 +569,7 @@ a {
   right: 0;
   bottom: 6px;
   color: #3f372c;
+  font-family: var(--mono);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;

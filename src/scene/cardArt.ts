@@ -11,8 +11,8 @@ type Rand = () => number
 
 const TYPEWRITER = '"Special Elite", "Courier New", monospace'
 const MONO = '"Courier Prime", "Courier New", monospace'
-const INK = '#2b2219'
-const FADED_INK = '#6b5a45'
+const INK = '#1f1a15'
+const FADED_INK = '#5a4b3a'
 const RED = '#a3261c'
 
 export const fontsReady: Promise<unknown> =
@@ -56,7 +56,7 @@ export function drawCard(ctx: Ctx, width: number, height: number, pin: Pin) {
 }
 
 function drawSubject(ctx: Ctx, w: number, h: number, u: number, rand: Rand) {
-  paper(ctx, 0, 0, w, h, '#efe6d0', rand)
+  paper(ctx, 0, 0, w, h, '#f7f3e8', rand)
 
   ctx.fillStyle = INK
   ctx.font = `${4.6 * u}px ${TYPEWRITER}`
@@ -136,8 +136,8 @@ function drawPhoto(ctx: Ctx, x: number, y: number, w: number, h: number, u: numb
 }
 
 function drawFolder(ctx: Ctx, w: number, h: number, u: number, pin: Pin, rand: Rand) {
-  const back = '#c49a45'
-  const front = '#dcb567'
+  const back = '#c79a3f'
+  const front = '#e6bd62'
   const tabW = 32 * u
   const tabH = 8 * u
 
@@ -163,24 +163,24 @@ function drawFolder(ctx: Ctx, w: number, h: number, u: number, pin: Pin, rand: R
 
   // White label with the project name
   const label = { x: 9 * u, y: 22 * u, w: 82 * u, h: 32 * u }
-  paper(ctx, label.x, label.y, label.w, label.h, '#f6f0e1', rand)
+  paper(ctx, label.x, label.y, label.w, label.h, '#fbf8f0', rand)
   ctx.strokeStyle = 'rgba(43, 34, 25, 0.35)'
   ctx.lineWidth = 0.4 * u
   ctx.strokeRect(label.x + 1.5 * u, label.y + 1.5 * u, label.w - 3 * u, label.h - 3 * u)
   ctx.fillStyle = INK
-  const titleSize = fitFont(ctx, pin.title, label.w - 8 * u, 8 * u, TYPEWRITER)
+  const titleSize = fitFont(ctx, pin.title, label.w - 8 * u, 9.5 * u, TYPEWRITER)
   ctx.fillText(pin.title, label.x + 4 * u, label.y + 5 * u + titleSize)
   if (pin.label) {
     ctx.fillStyle = FADED_INK
-    ctx.font = `bold ${4 * u}px ${MONO}`
-    wrapText(ctx, pin.label, label.x + 4 * u, label.y + 11 * u + titleSize, label.w - 8 * u, 4.6 * u, 2)
+    ctx.font = `bold ${4.6 * u}px ${MONO}`
+    wrapText(ctx, pin.label, label.x + 4 * u, label.y + 11.5 * u + titleSize, label.w - 8 * u, 5.2 * u, 2)
   }
 
   stamp(ctx, 'PROJECT', w - 22 * u, h - 8 * u, 4.4 * u, -0.1)
 }
 
 function drawIndexCard(ctx: Ctx, w: number, h: number, u: number, pin: Pin, rand: Rand) {
-  paper(ctx, 0, 0, w, h, '#f7f2e6', rand)
+  paper(ctx, 0, 0, w, h, '#faf7ef', rand)
   ctx.fillStyle = 'rgba(70, 110, 170, 0.35)'
   for (let y = 22 * u; y < h - 2 * u; y += 7 * u) ctx.fillRect(0, y, w, 0.35 * u)
   ctx.fillStyle = 'rgba(190, 50, 50, 0.55)'
@@ -204,7 +204,7 @@ function drawIndexCard(ctx: Ctx, w: number, h: number, u: number, pin: Pin, rand
 }
 
 function drawTag(ctx: Ctx, w: number, h: number, u: number, pin: Pin, rand: Rand) {
-  paper(ctx, 0, 0, w, h, '#eadcb9', rand)
+  paper(ctx, 0, 0, w, h, '#f3ecda', rand)
   ctx.strokeStyle = 'rgba(43, 34, 25, 0.45)'
   ctx.lineWidth = 0.6 * u
   ctx.setLineDash([2 * u, 1.4 * u])
@@ -246,7 +246,7 @@ function paper(ctx: Ctx, x: number, y: number, w: number, h: number, base: strin
   // Aged edges
   const edge = ctx.createRadialGradient(x + w / 2, y + h / 2, Math.min(w, h) * 0.35, x + w / 2, y + h / 2, Math.max(w, h) * 0.75)
   edge.addColorStop(0, 'rgba(120, 80, 30, 0)')
-  edge.addColorStop(1, 'rgba(120, 80, 30, 0.22)')
+  edge.addColorStop(1, 'rgba(120, 80, 30, 0.1)')
   ctx.fillStyle = edge
   ctx.fillRect(x, y, w, h)
 }

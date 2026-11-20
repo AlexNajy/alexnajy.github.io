@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { EffectComposer, Noise, ToneMapping } from '@react-three/postprocessing'
+import { ToneMappingMode } from 'postprocessing'
 import { connections, pins } from '../data/case'
 import { highlightSet, pinById } from '../lib/graph'
 import type { CardOrigin } from '../lib/cardOrigin'
@@ -42,21 +43,23 @@ export default function BoardScene({ hoveredId, openId, onHover, onOpen, reduced
       gl={{ antialias: !high, powerPreference: 'high-performance' }}
       onPointerMissed={() => onHover(null)}
     >
-      <color attach="background" args={['#2a1c12']} />
+      <color attach="background" args={['#101114']} />
 
-      {/* Warm fill so the whole board stays lit, not just the centre. */}
-      <ambientLight intensity={0.45} color="#ffd9ae" />
-      {/* The desk lamp. The cone is wide enough to cover the whole board, so
-          its soft edge falls on the wall rather than darkening the corners.
-          decay 0 keeps intensity independent of distance, which is easier to
-          tune than physical falloff for a single stylised light. */}
+      {/* A cool, dim fill. It keeps the corners readable and tints the
+          shadows blue-grey, which is what stops the scene reading as one
+          flat brown: warm light, cool shadow. */}
+      <ambientLight intensity={0.55} color="#c9d6ea" />
+      {/* The desk lamp. penumbra 1 fades the cone smoothly from its centre,
+          so the board is brightest around the profile and falls off toward
+          the edges. decay 0 keeps intensity independent of distance, which
+          is easier to tune than physical falloff for one stylised light. */}
       <spotLight
-        position={[-2.2, 3.2, 10]}
-        angle={0.72}
-        penumbra={0.7}
-        intensity={2.6}
+        position={[-1.6, 2.6, 9.5]}
+        angle={0.78}
+        penumbra={1}
+        intensity={3.1}
         decay={0}
-        color="#ffd6a0"
+        color="#fff0d9"
         castShadow
         shadow-mapSize={high ? [2048, 2048] : [1024, 1024]}
         shadow-bias={-0.0004}
@@ -86,7 +89,7 @@ export default function BoardScene({ hoveredId, openId, onHover, onOpen, reduced
           id={`${a}-${b}`}
           from={from}
           to={to}
-          emphasis={!focusId ? 'normal' : a === focusId || b === focusId ? 'lit' : 'dim'}
+          shown={a === focusId || b === focusId}
         />
       ))}
 
@@ -96,8 +99,10 @@ export default function BoardScene({ hoveredId, openId, onHover, onOpen, reduced
         // The composer renders to its own target, so MSAA happens here
         // (multisampling) rather than on the canvas.
         <EffectComposer multisampling={4}>
-          <ToneMapping />
-          <Noise opacity={0.045} premultiply />
+          {/* Same curve the renderer uses on the low-quality path, so both
+              paths have the same contrast. */}
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+          <Noise opacity={0.03} premultiply />
         </EffectComposer>
       )}
     </Canvas>

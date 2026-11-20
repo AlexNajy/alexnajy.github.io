@@ -1,4 +1,4 @@
-import { useFrame, type ThreeEvent } from '@react-three/fiber'
+import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber'
 import { useRef } from 'react'
 import { DoubleSide, Vector3, type Group, type MeshStandardMaterial } from 'three'
 import type { Pin } from '../data/types'
@@ -19,11 +19,12 @@ interface PinnedItemProps {
   onOpen: (id: string, origin: CardOrigin) => void
 }
 
-const DIM = 0.32
+const DIM = 0.42
 const LIFT = 0.06
 
 export function PinnedItem({ pin, emphasis, lifted, pickedUp, onHover, onOpen }: PinnedItemProps) {
   const texture = useCardTexture(pin)
+  const canvas = useThree((state) => state.gl.domElement)
   const liftRef = useRef<Group>(null)
   const materialRef = useRef<MeshStandardMaterial>(null)
   const [width, height] = CARD_SIZE[pin.kind]
@@ -60,10 +61,12 @@ export function PinnedItem({ pin, emphasis, lifted, pickedUp, onHover, onOpen }:
     event.stopPropagation()
     // Project the card's centre and its right edge onto the screen to find
     // where it is and how wide it looks, so the page can grow out of it.
+    // The canvas sits below the header, so measure against its own box.
     const card = event.object
+    const box = canvas.getBoundingClientRect()
     const toScreen = (local: Vector3) => {
       const ndc = card.localToWorld(local).project(event.camera)
-      return { x: ((ndc.x + 1) / 2) * window.innerWidth, y: ((1 - ndc.y) / 2) * window.innerHeight }
+      return { x: box.left + ((ndc.x + 1) / 2) * box.width, y: box.top + ((1 - ndc.y) / 2) * box.height }
     }
     const centre = toScreen(new Vector3(0, 0, 0))
     const edge = toScreen(new Vector3(width / 2, 0, 0))
